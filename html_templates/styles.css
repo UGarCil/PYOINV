@@ -1,0 +1,106 @@
+@charset "utf-8";
+/* CSS Document */
+@font-face {
+    font-family: ClementePDae-Light;
+    src: url(images/clementepdae-light.ttf);
+}
+hr { 
+    display: solid;
+    width: auto;
+    height: 1px;
+    background-color: #3300FF;
+    border-color: #3300FF;
+    border-style: solid;
+}
+
+.subtitulo_sp_pag {
+	text-align: center;
+	color: #BB7700;
+	font-size: 18pt;
+	font-family: Arial;
+	font-weight: bold;
+}
+.subtitulo_sp_pag a {
+	text-align: center;
+	font-size: 14pt;
+}
+body {
+	background-color: #FDFDFD;
+	color: #000000;
+	font-family: Arial, sans-serif;
+	font-size: 12pt;
+	font-weight: normal;
+	text-align: left;
+	line-height: 1.5;
+	margin-top: 20px;
+	margin-left: 20px;
+	margin-right: 20px;
+	margin-bottom: 20px;
+}
+a:link, a:active {
+	text-decoration: none;
+}
+a:visited {
+	text-decoration: none;
+}
+.wrap_global {
+	margin-top: 10px;
+	margin-left: 20px;
+	margin-right: 20px;
+	margin-bottom: 20px;
+	text-align: left;
+}
+.contenido {
+	margin-top: 0;
+	margin-bottom: 10px;
+	text-align: center;
+}
+.columnas_cv {
+	float:left;
+}
+.col_izq_cv {
+	width: 50%;
+	text-align:center;
+}
+.col_izq_cv p {
+}
+.col_der_cv {
+	width: 50%;
+	text-align: center;
+}
+.sp_data {
+	text-align: left;
+}
+.sp_name_pag {
+	color: #BB7700;
+	margin-top: 10px;
+	padding-bottom: 0px;
+	margin-bottom: 0px;
+	font-size: 14pt;
+	font-weight: bold;
+}
+a:hover {
+	background-color: #aaaaff;
+	color: #0000ff;
+	padding-right: 4px;
+
+}
+.fams_tot ul{
+	color: #000000;
+	padding-left: 0px;
+	margin-top: 0px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	margin-bottom: 0px;
+	font-size: 12pt;
+	font-weight: bold;
+}
+.fams_tot li{
+	color: #000000;
+	margin-left: 15px;
+	margin-top: 0px;
+	padding-bottom: 0px;
+	margin-bottom: 0px;
+	font-size: 12pt;
+	list-style-type: none;
+}
