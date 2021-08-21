@@ -1,40 +1,122 @@
 #!usr/bin/env/python
-# Program created on Aug 13th 2021 by Uriel Garcilazo as part of BIOINV2.2 from Alvarez-Padilla lab. The script consumes input from three sources:
-# - A text .txt file with the location of images 
-# - An excel file with information on the taxonomy of a group of species
-# - The structure of folders
-# 
-# It outputs an html with an inventory of the spiders
-# 
+# Pioinv 2.0: Create a webpage for standardized faunistic inventories
+# File created on August 18th by Uriel Garcilazo. Comments as UGC
+# The program receives a path representing the master folder from which images of species have been taken.
+# Images are assumed to have been named following a standardized protocol
 
 import os
-from os.path import join as jn 
+from os.path import join as jn
 import pandas as pd
-from CloneFolderTree import nestingFolders
-from Extract_images import getImages as getIMG
-
-# Use the 2 vector matrix made in Extrac_images.py as a dataframe, with empty cells read as empty strings
-df = pd.DataFrame(getIMG())
-df = df.fillna('')
-df = df.astype(str)
+from populateHtmls import populateHtmls
+import logging
 
 
-#If the file has been created before, chances are there's already information
-# created for the inventories. beenHereBefore is a check point
-beenHereBefore = False #If it stays False, then we're running this for the first time
+# Find the path to the images' folder
+currPath = os.getcwd()
+pathImages = jn(currPath, "Images")
 
-# A ternary operator: make sure the folder we're trying to make doesn't already exist, then make it.
-# If it does exist, set the var. beenHereBefore = True to update the checkpoint
-beenHereBefore = True if "HTML_SpeciesTree" in (os.listdir(os.getcwd())) else os.mkdir(jn(os.getcwd(),"HTML_SpeciesTree"))
-path = jn(os.getcwd(),"HTML_SpeciesTree") #root folder for recursively create htmls
-cssPath = jn(os.getcwd(), "html_templates", "styles.css") #html path is dynamic, CSS path is not
+# path to master html folder and the html/css templates
+os.mkdir("HTML_files") if "HTML_files" not in os.listdir(currPath) else print("There seems to be an HTML_files folder already. Some data loss could occur")
+masterHtmlPath = jn(currPath, "HTML_files")
+rootHtmlTemplates = jn(currPath, "html_templates")
 
-# If we just created the folder with HTMLs, then we can start creating the folders for each of the species
-# in our dataframe recursively, assigning them to their respective folders (e.g. species to their genus)
-if not beenHereBefore:
-    nestingFolders(df, path, cssPath)
-else:
-    print("There might be some data in the HTML species folder already. Erase the folder before continuing")
+# Load excel table with taxonomic information on species
+taxonomic_df = pd.read_excel(jn(currPath, "SPPDATA_EX.xlsx"))
+taxonomic_df = taxonomic_df.astype(str)
+taxonomic_df = taxonomic_df.fillna('')
+# Load dataframes with information on the name and view of the different structures
+views_df = pd.read_excel(jn(currPath, "structureNomenclature.xlsx"), sheet_name="views")
+struct_df = pd.read_excel(jn(currPath, "structureNomenclature.xlsx"), sheet_name="structures")
 
 
 
+
+def extractImagesList(path):
+    # Consume Path with images of species and return a String with absolute path for those images, separated by newline 
+    _String = ''
+    for root, folder, files in os.walk(pathImages):
+        for file in files:
+            _String += (jn(root,file))+ "\n" if file.endswith('.jpg')  else None
+    return(_String)
+
+
+def populateColumns(imageRow):
+    # Consume absolute path of image name and fill in the columns if future excel table
+    _String = '{}'.format(imageRow)
+    # Extract information based on index and split
+    imageRow = imageRow.split('\\')
+
+    # Following variables have same name as the columns they represent
+    imageName = imageRow[-1]
+    invCo = ""
+    invSpCode = imageName[0:10]
+    sexCo = imageName[10]
+    metCo = imageName[11]
+    parCo = imageName[12:15]
+    vieCo = imageName[15]
+    vouCo = imageName[16:22]
+    magCo = imageName.split('_')[1]
+    micCo = imageName.split('_')[2].split('.')[0]
+    ftyCo = imageName.split('.')[1]
+
+    # To fill the information on the view of the specimen for this particular image (i.e. row)
+    # we use the views_df and struct_df dataframes 
+    
+    imageStructure = struct_df[struct_df["AcrStr"] == parCo]["Structure"].values[0]
+    imageStrucView = views_df[views_df["AcrView"] == vieCo]["View"].values[0]
+
+    leGor = "{} {} view".format(imageStructure, imageStrucView)
+
+    # !!!cotBk was originally intended to express the desired order in which the images of different views would appear in the webpage
+    # There might be other ways to decide. We'll come back to this variable later, but in the meantime is useful to have it as
+    # an empty variable
+    cotBk = ''
+
+    # Let's read the SPPDATA dataframe to fill the last variables, which contain taxonomic information
+
+    # We will use the name of the genus + species contained within the images' full path to find our species
+    searchQuery = imageRow[-3:-1] #where -3 is the third element from the end of the array to the left, and -1 is the first element in the array, which isn't included but serves as boundary
+    # Find the taxonomic information using the searchQuery
+
+    speciesRow = taxonomic_df[taxonomic_df["SPECIES"] == ' '.join(searchQuery)]
+    family = speciesRow["FAMILY"].values[0]
+    genus = searchQuery[0]
+    spp = searchQuery[1]
+    sppName = ' '.join(searchQuery)
+    wsc_number = speciesRow["WSP_NUM"].values[0]
+    spAuth = speciesRow["SP_AUTHOR"].values[0]
+    spDistPl = speciesRow["DIST"].values[0]
+    vouchCo2 = speciesRow["VOUCOD"].values[0]
+    locData = speciesRow["LOCALITY"].values[0]
+    det = speciesRow["ID AUTHOR"].values[0]
+    femSpe = speciesRow["FEMNUM"].values[0]
+    malSpe = speciesRow["MALNUM"].values[0]
+    taxNot = speciesRow["TAXON NOTES"].values[0]
+    imgAut = speciesRow["SPPIMAUT"].values[0]
+    
+
+    
+
+
+    _String += ("\t{}"*27).format(
+        imageName, invCo, invSpCode, sexCo, metCo, parCo, vieCo, vouCo, magCo, micCo, ftyCo, leGor, cotBk,
+        family, genus, spp, sppName, wsc_number, spAuth, spDistPl, vouchCo2, locData, det, femSpe, malSpe, taxNot, imgAut
+    )
+    return(_String.split('\t'))
+
+listImages = extractImagesList(pathImages).split('\n')
+
+# Name of column headers. For additional information look at Ex_Esquema...xlsx
+EsHeaders = ["HR_OLD_ADDS", "IMAGENAME", "INVCO", "InvSP_CODE", "SEXCO", "METCO", "PARCO", "VIECO", "VOUCO", "MAGCO", "MICCO", "FTYCO", "LEGOR", "COTBK", "FAMILY", "GENUS", "SPP", "SPECIES", "WSC", "SPAUTH", "SPDISTPL", "VOUCO2", "LOCDATA", "DET", "FEMSPE", "MALSPE", "TAXNOT", "IMGAUT"]
+
+# Make the dataframe of our new Esquema by first processing each of the image paths by adding values for the columns
+# specified in EsHeaders, then adding the edited row to a list. Then turn that list into a pandas dataframe
+newEsquema = []
+[newEsquema.append(populateColumns(row)) for row in listImages if len(row)!=0]
+# Turn the new list of lists (i.e. table) into a new array
+newEsquema_df = pd.DataFrame(newEsquema, columns=EsHeaders)
+
+# Save new Esquema into an excel file
+newEsquema_df.to_excel("Esquema.xlsx")
+
+populateHtmls(newEsquema_df, rootHtmlTemplates, masterHtmlPath)

@@ -4,6 +4,49 @@
     font-family: ClementePDae-Light;
     src: url(images/clementepdae-light.ttf);
 }
+
+@media (min-width: 100px) {
+	.myh3{
+		font-size: small;
+		text-align: center;
+	}	
+}
+
+@media (min-width: 544px) {
+	.myh3{
+		font-size: small;
+		text-align: center;
+	}
+}
+
+/* Medium devices (tablets, 768px and up) The navbar toggle appears at this breakpoint */
+
+@media (min-width: 768px) {
+	.myh3{
+		font-size: medium;
+		text-align: center;
+	}
+}
+
+/* Large devices (desktops, 992px and up) */
+
+@media (min-width: 992px) {
+	.myh3{
+		font-size: x-large;
+		text-align: center;
+	}
+}
+
+/* Extra large devices (large desktops, 1200px and up) */
+
+@media (min-width: 1200px) {
+	.myh3{
+		font-size: xx-large;
+		text-align: center;
+	}
+}
+
+
 hr { 
     display: solid;
     width: auto;
@@ -103,4 +146,11 @@ a:hover {
 	margin-bottom: 0px;
 	font-size: 12pt;
 	list-style-type: none;
+}
+
+img{
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	width: 50%
 }
