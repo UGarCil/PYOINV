@@ -6,23 +6,38 @@ To run the program you will need to following libraries installed along with a p
 - PIL (pillow)
 
 Installation:
-We strongly recommend using anaconda to run Pyioinv, as package install is much simpler. Download anaconda for your OS and add it to the PATH, in the system variables. Once it's installed, you can install pillow and pandas with the following commands:
+We strongly recommend using anaconda to run Pyioinv, as the package installing is much simpler. Download anaconda for your OS and add it to the PATH, in the system variables. Once it's installed, you can install pillow and pandas with the following commands:
 
+```
 conda install -c anaconda pillow
 conda install -c anaconda pandas
+```
 
-We recommend however that you install both programs in one go while creating a new environment:
+##We recommend however that you install both programs in one go while creating a new environment:
 
+```
 conda create --name Pyoinv pandas pillow
+```
 
 Then, to activate your new environment, simply type:
 
+```
 conda activate Pyoinv
+```
 
-access the Pyoinv folder from the terminal and run the following command (while still in your environment):
+##Clone and run the repository
 
+Go to Code > Download ZIP and extract the folder in your chosen folder
+
+Access the Pyoinv folder from the terminal and edit the SPPDATA_Ex.xlsx with your taxonomic database, and replace the contents of the "Images" folder with the contents in your own directory tree (I recommend you simply erasing the Images folder already in Pyoinv, changing the name of the folder containing your own images to "Images" and then place it in the Pyoinv directory). You might also need to change the contents of the table "structureNomenclature.xlsx" if you have images of structures that are not already in the table.
+
+Once you're done editing your data, run the following command from the terminal (while still in your environment)
+
+```
 python main.py
+```
 
+If everything is in place
 ##Some major changes in the structure of the pipeline:
 Starting September 13th, Pyoinv changed the way the Eschema.xlsx file is created. The program does the following:
 1. Create a clone of the tree directory "Images". The new folder is called Thumbnails and contains a low resolution image of each of your species' views. This step was implemented to maximize computational resources when loading the page.
