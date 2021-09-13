@@ -6,7 +6,7 @@ To run the program you will need to following libraries installed along with a p
 - PIL (pillow)
 
 Installation:
-We strongly recommend using anaconda to run Pyioinv, as the package installing is much simpler. Download anaconda for your OS and add it to the PATH, in the system variables. Once it's installed, you can install pillow and pandas with the following commands:
+We strongly recommend using anaconda to run Pyoinv, as the package installing is much simpler. Download anaconda for your OS and add it to the PATH, in the system variables. Once it's installed, you can install pillow and pandas with the following commands:
 
 ```
 conda install -c anaconda pillow
@@ -56,4 +56,4 @@ Starting September 13th, Pyoinv changed the way the Eschema.xlsx file is created
 ## Putting my inventory on the web
 Transfer all the items inside the master folder into your hosting provider cpanel's File manager (inside your public_html)
 
-##We hope you enjoy Pyoinv! Please let us know if you run into any problems by sending an email to fap at ciencias.unam.mx
+### We hope you enjoy Pyoinv! Please let us know if you run into any problems by sending an email to fap at ciencias.unam.mx
