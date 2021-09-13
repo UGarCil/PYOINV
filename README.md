@@ -39,6 +39,8 @@ python main.py
 
 If everything is in place the program will finish running and you'll have a new "HTML_files" folder containing your inventory in htmls, and also an index.html file located in the master folder with the home directory.
 
+We included a log file system. Please make sure not to change the names of the excel file's columns, position in the master folder or the file's name. The log file might be useful to retrieve some critical errors that you may encounter. You can find it in the master folder, named as "Log.txt"
+
 ## Some major changes in the structure of the pipeline:
 Starting September 13th, Pyoinv changed the way the Eschema.xlsx file is created. The program does the following:
 1. Create a clone of the tree directory "Images". The new folder is called Thumbnails and contains a low resolution image of each of your species' views. This step was implemented to maximize computational resources when loading the page.
@@ -49,9 +51,9 @@ Starting September 13th, Pyoinv changed the way the Eschema.xlsx file is created
 
 3. Create htmls: the index.html is created providing a list of the taxa with the highest taxonomic range (usually Family), then it creates an html tree ending in the least inclusive taxon that is species. The species htmls incorporate the images from the thumbnails, with hyperlinks to their original, high res versions.
 
-We included a log file system. Please make sure not to change the names of the excel file's columns, position in the master folder or the file's name. The log file might be useful to retrieve some critical errors that you may encounter. You can find it in the master folder, named as "Log.txt"
 
-##Putting my inventory on the web
+
+## Putting my inventory on the web
 Transfer all the items inside the master folder into your hosting provider cpanel's File manager (inside your public_html)
 
 ##We hope you enjoy Pyoinv! Please let us know if you run into any problems by sending an email to fap at ciencias.unam.mx
