@@ -13,7 +13,7 @@ conda install -c anaconda pillow
 conda install -c anaconda pandas
 ```
 
-##We recommend however that you install both programs in one go while creating a new environment:
+## We recommend however that you install both programs in one go while creating a new environment:
 
 ```
 conda create --name Pyoinv pandas pillow
@@ -25,7 +25,7 @@ Then, to activate your new environment, simply type:
 conda activate Pyoinv
 ```
 
-##Clone and run the repository
+## Clone and run the repository
 
 Go to Code > Download ZIP and extract the folder in your chosen folder
 
@@ -37,8 +37,9 @@ Once you're done editing your data, run the following command from the terminal 
 python main.py
 ```
 
-If everything is in place
-##Some major changes in the structure of the pipeline:
+If everything is in place the program will finish running and you'll have a new "HTML_files" folder containing your inventory in htmls, and also an index.html file located in the master folder with the home directory.
+
+## Some major changes in the structure of the pipeline:
 Starting September 13th, Pyoinv changed the way the Eschema.xlsx file is created. The program does the following:
 1. Create a clone of the tree directory "Images". The new folder is called Thumbnails and contains a low resolution image of each of your species' views. This step was implemented to maximize computational resources when loading the page.
 
