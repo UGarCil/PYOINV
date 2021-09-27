@@ -47,10 +47,11 @@
 }
 
 
+
 hr { 
     display: solid;
     width: auto;
-    height: 1px;
+    height: 2px;
     background-color: #3300FF;
     border-color: #3300FF;
     border-style: solid;
@@ -80,6 +81,10 @@ body {
 	margin-right: 20px;
 	margin-bottom: 20px;
 }
+
+
+
+
 a:link, a:active {
 	text-decoration: none;
 }
@@ -153,4 +158,10 @@ img{
 	margin-left: auto;
 	margin-right: auto;
 	width: 50%
+}
+
+
+/* UGC  changes for bootstrap*/
+.UGC-dark-bg{
+	background-color: #eeeeee;
 }
