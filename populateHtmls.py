@@ -42,9 +42,9 @@ def populateHtmls(df, rootHtmlTemplates, masterHtmlPath):
     # Assert the existence of each of the files above
     for eachpath in [speciesTemplate, TaxRankTemplate, cssTemplate]:
         try:
-            assert(os.path.isfile(eachpath)), "The file {} is mispelled or it doesn't exist in the folder html_templates".format(eachpath.split('\\')[-1])
+            assert(os.path.isfile(eachpath)), "The file {} is mispelled or it doesn't exist in the folder html_templates".format(eachpath.split('/')[-1])
         except AssertionError as err:
-            logging.critical("The file {} is mispelled or it doesn't exist in the folder html_templates.".format(eachpath.split('\\')[-1]))
+            logging.critical("The file {} is mispelled or it doesn't exist in the folder html_templates.".format(eachpath.split('/')[-1]))
             raise err
 
     # Taxonomic rank names below match column names from Esquema
@@ -67,14 +67,14 @@ def populateHtmls(df, rootHtmlTemplates, masterHtmlPath):
             for name in uniqueRecords:
                 if isIndex:
                     if taxonomic_Ranks[indxHighRank] == "SPECIES": #if the inventory only contains species, refer to the species elements directly
-                        _String_gctl += '<li><a href="{}">{}</a></li>\n'.format(".\\HTML_files\\Species\\{}.html".format(name),name)
+                        _String_gctl += '<li><a target= "wel" href="{}"><i>{}</i></a></li>\n'.format("./HTML_files/Species/{}.html".format(name),name)
                     else:
-                        _String_gctl += '<li><a href="{}">{}</a></li>\n'.format(".\\HTML_files\\Menus\\{}.html".format(name),name)
+                        _String_gctl += '<li><a target= "invs" href="{}">{}</a></li>\n'.format("./HTML_files/Menus/{}.html".format(name),name)
                 else:
                     if columnName == "SPECIES":
-                        _String_gctl += '<li><a href="{}">{}</a></li>\n'.format("..\\Species\\{}.html".format(name),name)
+                        _String_gctl += '<li><a target= "wel" href="{}"><i>{}</i></a></li>\n'.format("../Species/{}.html".format(name),name)
                     else:
-                        _String_gctl += '<li><a href="{}">{}</a></li>\n'.format("..\\Menus\\{}.html".format(name),name)
+                        _String_gctl += '<li><a target= "invs" href="{}">{}</a></li>\n'.format("../Menus/{}.html".format(name),name)
             return(_String_gctl)
 
         def fillDescription (taxname):
@@ -103,7 +103,7 @@ def populateHtmls(df, rootHtmlTemplates, masterHtmlPath):
                 if s == "f":
                     fullSex = "Female:"
                 elif s == "m":
-                    fullSex = "Male"
+                    fullSex = "Male:"
                 else:
                     fullSex = "Juvenile/undetermined"
                 return (fullSex)
@@ -116,7 +116,7 @@ def populateHtmls(df, rootHtmlTemplates, masterHtmlPath):
             def trimAbsPath(pathString):
             # Consume a string representing full path to an image and turns it into relative path using the folder Images as master folder 
                 # We start with the assumption that we're located in the Species folder, then we need to go up two directories, then enter images
-                relativePath = '..\\..\\Images\\' + pathString.split('Images')[1][1:]
+                relativePath = '../../Images/' + pathString.split('Images')[1][1:]
                 return(relativePath)
 
             _String = ''
@@ -136,20 +136,27 @@ def populateHtmls(df, rootHtmlTemplates, masterHtmlPath):
                                     if img["IMAGENAME"] not in blackList:
                                         # print(img["IMAGENAME"])
                                         blackList.append(img["IMAGENAME"])
-                                        _String += '<a href="{}" target="blank">\n<img src="{}" alt="{}"> \n<h3 class="myh3">{}</h3>\n</a>\n'.format(trimAbsPath(img["HR_OLD_ADDS"]), trimAbsPath(img["HR_OLD_ADDS"]).replace("\\Images\\","\\Thumbnails\\"), img["IMAGENAME"], img["LEGOR"])
+                                        # _String += '<a href="{}" target="blank">\n<img src="{}" alt="{}"> \n<h3 class="myh3">{}</h3>\n</a>\n'.format(trimAbsPath(img["HR_OLD_ADDS"]), trimAbsPath(img["HR_OLD_ADDS"]).replace("/Images/","/Thumbnails/"), img["IMAGENAME"], img["LEGOR"])
+                                        #html instructions to request file to open in new window. _Strign got really long and it was hard to keep track of the quotes
+                                        newWindowHtml = "window.open('{}', 'newwindow6957 ', 'width=500, height=400'); return false;".format(trimAbsPath(img["HR_OLD_ADDS"]))
+                                        _String += '<a href="{}" onclick=\"{}\" target="_blank">\n<img src="{}" alt="{}"> \n<h3 class="myh3">{}</h3>\n</a>\n'.format(
+                                                                                                                                                    trimAbsPath(img["HR_OLD_ADDS"]), 
+                                                                                                                                                    newWindowHtml,
+                                                                                                                                                    trimAbsPath(img["HR_OLD_ADDS"]).replace("/Images/","/Thumbnails/"),
+                                                                                                                                                    img["IMAGENAME"], img["LEGOR"])
                                         logging.info("Adding {} to {}.html".format(img["IMAGENAME"],taxname))
                                 
                             else:
                                 if img["IMAGENAME"][12:15] == item:
                                     if img["IMAGENAME"] not in blackList:
                                         blackList.append(img["IMAGENAME"])
-                                        _String += '<a href="{}" target="blank">\n<img src="{}" alt="{}"> \n<h3 class="myh3">{}</h3>\n</a>\n'.format(trimAbsPath(img["HR_OLD_ADDS"]), trimAbsPath(img["HR_OLD_ADDS"]).replace("\\Images\\","\\Thumbnails\\"), img["IMAGENAME"], img["LEGOR"])
+                                        _String += '<a href="{}" target="blank">\n<img src="{}" alt="{}"> \n<h3 class="myh3">{}</h3>\n</a>\n'.format(trimAbsPath(img["HR_OLD_ADDS"]), trimAbsPath(img["HR_OLD_ADDS"]).replace("/Images/","/Thumbnails/"), img["IMAGENAME"], img["LEGOR"])
                                         logging.info("Adding {} to {}.html".format(img["IMAGENAME"],taxname))
                 # Once the main designation of the images in the html of the species have been set up, we can place anything else (i.e., legs, spinnerets, etc.)
                 for indx, img in listImages.iterrows():
                     if img["IMAGENAME"] not in blackList and img["IMAGENAME"][10] == sex:
                         blackList.append(img["IMAGENAME"])
-                        _String += '<a href="{}" target="blank">\n<img src="{}" alt="{}"> \n<h3 class="myh3">{}</h3>\n</a>\n'.format(trimAbsPath(img["HR_OLD_ADDS"]), trimAbsPath(img["HR_OLD_ADDS"]).replace("\\Images\\","\\Thumbnails\\"), img["IMAGENAME"], img["LEGOR"])
+                        _String += '<a href="{}" target="blank">\n<img src="{}" alt="{}"> \n<h3 class="myh3">{}</h3>\n</a>\n'.format(trimAbsPath(img["HR_OLD_ADDS"]), trimAbsPath(img["HR_OLD_ADDS"]).replace("/Images/","/Thumbnails/"), img["IMAGENAME"], img["LEGOR"])
                         logging.info("Adding {} to {}.html".format(img["IMAGENAME"],taxname))
 
             return(_String)
@@ -166,14 +173,17 @@ def populateHtmls(df, rootHtmlTemplates, masterHtmlPath):
             configTags = ["[csspath]","[TaxonName]","[TaxonSearch]","[PopList]"]
             for indx, tag in enumerate(configTags):
                 if indx == 0: #The csspath tag
-                    file_read = file_read.replace(tag, cssTemplate)
+                    if pathToPopulate == inventoryHomeName:
+                        file_read = file_read.replace(tag, "./html_templates/styles.css")
+                    else:
+                        file_read = file_read.replace(tag, "../../html_templates/styles.css")
                 elif indx == 1: #The Taxon name tag
                     file_read = file_read.replace(tag, taxonName)
                 elif indx ==2: #The Search title in the body
                     file_read = file_read.replace(tag, "{} search".format(currentTaxLevel))
                 else: #The list of child taxonomic nodes
                     # Get a unique list of that taxonomic level in the df
-                    if 'index.html' in pathToPopulate:
+                    if 'fams_menu.html' in pathToPopulate:
                     # If the word index is contained in the file to populate, it means is the home html
                         file_read = file_read.replace(tag, getChildTaxonList(currentTaxLevel, tax_df, True))
                     else:
@@ -182,16 +192,19 @@ def populateHtmls(df, rootHtmlTemplates, masterHtmlPath):
             configTags = ["[csspath]","[speciesName]", "[backHome]", "[speciesDescription]","[speciesImages]"]
             for indx, tag in enumerate(configTags):
                 if indx == 0: #The csspath tag
-                    file_read = file_read.replace(tag, cssTemplate)
+                    file_read = file_read.replace(tag, "../../html_templates/styles.css" )
                 elif indx == 1: #The Taxon name tag
-                    file_read = file_read.replace(tag, "<em>{}</em>".format(taxonName))
+                    if len(taxonName) > 1: #taxon name was passed as a tuple. If there's a second value, it means there's autorship information
+                        file_read = file_read.replace(tag, "<em>{}</em> {}".format(taxonName[0], taxonName[1]))
+                    else: #otherwise, there's probably a number representing morphospecies that shouldn't be in italics
+                        file_read = file_read.replace(tag, "<em>{}</em> {}".format(taxonName[0].split(' ')[0], taxonName[0].split(' ')[1]))
                 elif indx ==2: #Back Home link
-                    file_read = file_read.replace(tag, '<h2><a href="..\\..\\{}.html">{}</a></h2>\n'.format(chosenNameInv, "Inventory website"))
+                    file_read = file_read.replace(tag, '<a target= "_blank" href="..\..\index.html"> <P><CENTER>Back to inventory website </CENTER></a>\n'.format(chosenNameInv, "Inventory website"))
                 elif indx ==3: #The Search title in the body
-                    file_read = file_read.replace(tag, fillDescription(taxonName))
+                    file_read = file_read.replace(tag, fillDescription(taxonName[0]))
                 else: #The list of child taxonomic nodes
                     # Get a unique list of that taxonomic level in the df
-                    file_read = file_read.replace(tag, displayImages(taxonName))
+                    file_read = file_read.replace(tag, displayImages(taxonName[0]))
 
         with open(pathToPopulate, "w", encoding='utf-8') as file_write:
             file_write.write(file_read)    
@@ -213,8 +226,16 @@ def populateHtmls(df, rootHtmlTemplates, masterHtmlPath):
             for species in childrenTaxa:                
                 targetHtml = jn(speciesHtmlPath, '{}.html'.format(species))
                 isSpecies = True
+
+                #pass species+author when possible using a tuple
+                authorThisSpecies = r_df[r_df[thisTaxonRank] == species]["SPAUTH"].values[0]
+                if authorThisSpecies != "0":
+                    speciesAuth = [species, authorThisSpecies]
+                    print(speciesAuth)
+                else:
+                    speciesAuth = [species]
                 copyfile(speciesTemplate, targetHtml)
-                editHTML(targetHtml, isSpecies, species, thisTaxonRank, r_df)
+                editHTML(targetHtml, isSpecies, speciesAuth, thisTaxonRank, r_df)
               
 
     # what is the highest taxonomic rank in the Inventory? Compare columns in df with the taxonomic ranks
@@ -223,10 +244,10 @@ def populateHtmls(df, rootHtmlTemplates, masterHtmlPath):
 
             
     # First create the main inventory page
-    chosenNameInv = "index"
+    chosenNameInv = "fams_menu"
     inventoryHomeName = jn(currPath, '{}.html'.format(chosenNameInv))
     copyfile(TaxRankTemplate, inventoryHomeName)
-    editHTML(inventoryHomeName, False, "HOME", taxonomic_Ranks[indxHighRank], df)
+    editHTML(inventoryHomeName, False, "Family search:", taxonomic_Ranks[indxHighRank], df)
 
     # Then, create htmls recursively starting at the highest taxonomic rank
     recursion(indxHighRank, df)

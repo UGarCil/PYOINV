@@ -54,7 +54,7 @@ def populateColumns(imageRow):
     # Consume absolute path of image name and fill in the columns if future excel table
     _String = '{}'.format(imageRow)
     # Extract information based on index and split
-    imageRow = imageRow.split('\\')
+    imageRow = imageRow.split('/')
 
 
     # Following variables have same name as the columns they represent
@@ -136,7 +136,7 @@ clonedirectories(pathImages,"Thumbnails")
 logging.info("The new directory Thumbnails has been successfully created")
 
 logging.info("Retrieving images list..")
-listImages = extractImagesList(pathImages).split('\n')
+listImages = extractImagesList(pathImages).replace('\\','/').split('\n')
 logging.info("A list of images has been retrieved from the 'Images' folder")
 
 # Name of column headers. For additional information look at Ex_Esquema...xlsx
