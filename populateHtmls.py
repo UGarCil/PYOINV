@@ -9,6 +9,7 @@ from os.path import join as jn
 import pandas as pd
 from shutil import copyfile
 import logging
+import random as rn
 
 currPath = os.getcwd()
 # test_df = pd.read_excel("Esquema.xlsx")
@@ -118,7 +119,19 @@ def populateHtmls(df, rootHtmlTemplates, masterHtmlPath):
                 # We start with the assumption that we're located in the Species folder, then we need to go up two directories, then enter images
                 relativePath = '../../Images/' + pathString.split('Images')[1][1:]
                 return(relativePath)
+            def generateUniqueImg():
+                return 'newwindow{}'.format(''.join([str(rn.randint(0,9)) for x in range(4)]))
 
+            def anchorTagBuilder(img_path, img_name, img_structureAndView):
+                anchorTag = ''
+                newWindowHtml = "window.open('{}', '{}', 'width=500, height=400'); return false;".format(trimAbsPath(img_path), generateUniqueImg())
+                anchorTag += '<a href="{}" onclick=\"{}\" target="_blank">\n<img src="{}" alt="{}"> \n<h3 class="myh3">{}</h3>\n</a>\n'.format(
+                                                                                                                        trimAbsPath(img_path), 
+                                                                                                                        newWindowHtml,
+                                                                                                                        trimAbsPath(img_path).replace("/Images/","/Thumbnails/"),
+                                                                                                                        img_name, img_structureAndView)
+                return(anchorTag)
+            
             _String = ''
             # Get a list of all pictures for a given species
             listImages = df[df["SPECIES"] == taxname]
@@ -134,29 +147,26 @@ def populateHtmls(df, rootHtmlTemplates, masterHtmlPath):
                             if len(item)==4:
                                 if img["IMAGENAME"][12:16] == item:
                                     if img["IMAGENAME"] not in blackList:
-                                        # print(img["IMAGENAME"])
                                         blackList.append(img["IMAGENAME"])
-                                        # _String += '<a href="{}" target="blank">\n<img src="{}" alt="{}"> \n<h3 class="myh3">{}</h3>\n</a>\n'.format(trimAbsPath(img["HR_OLD_ADDS"]), trimAbsPath(img["HR_OLD_ADDS"]).replace("/Images/","/Thumbnails/"), img["IMAGENAME"], img["LEGOR"])
                                         #html instructions to request file to open in new window. _Strign got really long and it was hard to keep track of the quotes
-                                        newWindowHtml = "window.open('{}', 'newwindow6957 ', 'width=500, height=400'); return false;".format(trimAbsPath(img["HR_OLD_ADDS"]))
-                                        _String += '<a href="{}" onclick=\"{}\" target="_blank">\n<img src="{}" alt="{}"> \n<h3 class="myh3">{}</h3>\n</a>\n'.format(
-                                                                                                                                                    trimAbsPath(img["HR_OLD_ADDS"]), 
-                                                                                                                                                    newWindowHtml,
-                                                                                                                                                    trimAbsPath(img["HR_OLD_ADDS"]).replace("/Images/","/Thumbnails/"),
-                                                                                                                                                    img["IMAGENAME"], img["LEGOR"])
+                                        
+
+                                        _String += anchorTagBuilder(img["HR_OLD_ADDS"], img["IMAGENAME"], img["LEGOR"])
                                         logging.info("Adding {} to {}.html".format(img["IMAGENAME"],taxname))
                                 
                             else:
                                 if img["IMAGENAME"][12:15] == item:
                                     if img["IMAGENAME"] not in blackList:
                                         blackList.append(img["IMAGENAME"])
-                                        _String += '<a href="{}" target="blank">\n<img src="{}" alt="{}"> \n<h3 class="myh3">{}</h3>\n</a>\n'.format(trimAbsPath(img["HR_OLD_ADDS"]), trimAbsPath(img["HR_OLD_ADDS"]).replace("/Images/","/Thumbnails/"), img["IMAGENAME"], img["LEGOR"])
+                                        # _String += '<a href="{}" target="blank">\n<img src="{}" alt="{}"> \n<h3 class="myh3">{}</h3>\n</a>\n'.format(trimAbsPath(img["HR_OLD_ADDS"]), trimAbsPath(img["HR_OLD_ADDS"]).replace("/Images/","/Thumbnails/"), img["IMAGENAME"], img["LEGOR"])
+                                        _String += anchorTagBuilder(img["HR_OLD_ADDS"], img["IMAGENAME"], img["LEGOR"])
                                         logging.info("Adding {} to {}.html".format(img["IMAGENAME"],taxname))
                 # Once the main designation of the images in the html of the species have been set up, we can place anything else (i.e., legs, spinnerets, etc.)
                 for indx, img in listImages.iterrows():
                     if img["IMAGENAME"] not in blackList and img["IMAGENAME"][10] == sex:
                         blackList.append(img["IMAGENAME"])
-                        _String += '<a href="{}" target="blank">\n<img src="{}" alt="{}"> \n<h3 class="myh3">{}</h3>\n</a>\n'.format(trimAbsPath(img["HR_OLD_ADDS"]), trimAbsPath(img["HR_OLD_ADDS"]).replace("/Images/","/Thumbnails/"), img["IMAGENAME"], img["LEGOR"])
+                        _String += anchorTagBuilder(img["HR_OLD_ADDS"], img["IMAGENAME"], img["LEGOR"])
+                        # _String += '<a href="{}" target="blank">\n<img src="{}" alt="{}"> \n<h3 class="myh3">{}</h3>\n</a>\n'.format(trimAbsPath(img["HR_OLD_ADDS"]), trimAbsPath(img["HR_OLD_ADDS"]).replace("/Images/","/Thumbnails/"), img["IMAGENAME"], img["LEGOR"])                                                                                                                            img["IMAGENAME"], img["LEGOR"])
                         logging.info("Adding {} to {}.html".format(img["IMAGENAME"],taxname))
 
             return(_String)
