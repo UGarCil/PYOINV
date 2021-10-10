@@ -83,16 +83,14 @@ def populateHtmls(df, rootHtmlTemplates, masterHtmlPath):
             # Because names in Esquema are repeated based on number of images for each voucher, we take one of such images,
             # doesn't matter which one, to populate the empty string
             taxrow = df[df["SPECIES"] == taxname].head(1)
-            
-            
-            
             Des = ''
             Des += "<b>Species Code: </b>" + (taxrow["VOUCO2"].values[0]) + ". "
             Des += "<b>Locality: </b>" + (taxrow["LOCDATA"]).values[0] + ". "
-            Des += "<b>Species ID: </b>" + (taxrow["DET"]).values[0] + ". "
             Des += "<b>Specimens:</b> Female, " + (taxrow["FEMSPE"]).values[0] + ", Male " + (taxrow["MALSPE"].values[0]) + ". "
-            Des += "<b>Images author: </b>" + (taxrow["IMGAUT"]).values[0] + ". "
-            Des += "For nomenclatural changes on this taxon ID reffer to its Unique Record Number in The World Spider Catalog {}.".format(taxrow["WSC"].values[0])
+            Des += "<b>Species ID: </b>" + (taxrow["DET"]).values[0] + ". "
+            Des += "<b>Images author: </b>" + (taxrow["IMGAUT"]).values[0] + ". " 
+            Des += "<b>Taxonomic notes: </b>" + (taxrow["TAXNOT"]).values[0] + ". " if (taxrow["TAXNOT"]).values[0] !="0" else ""
+            Des += "For taxon name changes use this code {} in The World Spider Catalog. ".format(taxrow["WSC"].values[0])
             
             return(Des)
         
@@ -105,8 +103,10 @@ def populateHtmls(df, rootHtmlTemplates, masterHtmlPath):
                     fullSex = "Female:"
                 elif s == "m":
                     fullSex = "Male:"
+                elif s.lower() == "j":
+                    fullSex = "Juvenile"
                 else:
-                    fullSex = "Juvenile/undetermined"
+                    fullSex = "Sex undetermined"
                 return (fullSex)
             def thereIsSex(s, l_df):
             # Consume string with male or female, search through dataframe and return boolean on presence/absence of at least 1 image with that sex in index 10
@@ -123,14 +123,20 @@ def populateHtmls(df, rootHtmlTemplates, masterHtmlPath):
                 return 'newwindow{}'.format(''.join([str(rn.randint(0,9)) for x in range(4)]))
 
             def anchorTagBuilder(img_path, img_name, img_structureAndView):
-                anchorTag = ''
-                newWindowHtml = "window.open('{}', '{}', 'width=500, height=400'); return false;".format(trimAbsPath(img_path), generateUniqueImg())
-                anchorTag += '<a href="{}" onclick=\"{}\" target="_blank">\n<img src="{}" alt="{}"> \n<h3 class="myh3">{}</h3>\n</a>\n'.format(
-                                                                                                                        trimAbsPath(img_path), 
-                                                                                                                        newWindowHtml,
-                                                                                                                        trimAbsPath(img_path).replace("/Images/","/Thumbnails/"),
-                                                                                                                        img_name, img_structureAndView)
-                return(anchorTag)
+                if os.path.exists(img_path):
+                    with open(jn(currPath, "Summary_images_processed.txt"), "a") as summaryFile:
+                        summaryFile.write(f"{img_name}\t{taxname}\t{img_structureAndView}\t{trimAbsPath(img_path)}\n")
+                    anchorTag = ''
+                    newWindowHtml = "window.open('{}', '{}', 'width=500, height=400'); return false;".format(trimAbsPath(img_path), generateUniqueImg())
+                    anchorTag += '<a href="{}" onclick=\"{}\" target="_blank">\n<img src="{}" alt="{}"> \n<h4 class="myh4">{}</h4>\n</a>\n'.format(
+                                                                                                                            trimAbsPath(img_path), 
+                                                                                                                            newWindowHtml,
+                                                                                                                            trimAbsPath(img_path).replace("/Images/","/Thumbnails/"),
+                                                                                                                            img_name, img_structureAndView)
+                    return(anchorTag)
+                else:
+                    logging.info(f"The image {img_path} doesn't exist. Was it erased?")
+                    return ("")
             
             _String = ''
             # Get a list of all pictures for a given species
@@ -140,7 +146,9 @@ def populateHtmls(df, rootHtmlTemplates, masterHtmlPath):
             for sex in ["f", "m", 'j']:
                 if thereIsSex(sex, listImages):
                     fullSex = determineSex(sex)
-                    _String += "<h2>{}</h2>\n".format(fullSex)
+                    _String += "<h3>{}</h3>\n".format(fullSex)
+                else:
+                    logging.info(f"No images were found with the sex tag {sex} and species {taxname}. If photovouchers exist their sex couldn't be included. Valid tags are f (female), m (male), j (juvenile), u (unknown)")
                 for item in orderShow:
                     for indx, img in listImages.iterrows():
                         if img["IMAGENAME"][10] == sex:
@@ -149,16 +157,16 @@ def populateHtmls(df, rootHtmlTemplates, masterHtmlPath):
                                     if img["IMAGENAME"] not in blackList:
                                         blackList.append(img["IMAGENAME"])
                                         #html instructions to request file to open in new window. _Strign got really long and it was hard to keep track of the quotes
+                                        imageToAdd = anchorTagBuilder(img["HR_OLD_ADDS"], img["IMAGENAME"], img["LEGOR"])
+                                        _String += imageToAdd
                                         
-
-                                        _String += anchorTagBuilder(img["HR_OLD_ADDS"], img["IMAGENAME"], img["LEGOR"])
                                         logging.info("Adding {} to {}.html".format(img["IMAGENAME"],taxname))
                                 
                             else:
                                 if img["IMAGENAME"][12:15] == item:
                                     if img["IMAGENAME"] not in blackList:
                                         blackList.append(img["IMAGENAME"])
-                                        # _String += '<a href="{}" target="blank">\n<img src="{}" alt="{}"> \n<h3 class="myh3">{}</h3>\n</a>\n'.format(trimAbsPath(img["HR_OLD_ADDS"]), trimAbsPath(img["HR_OLD_ADDS"]).replace("/Images/","/Thumbnails/"), img["IMAGENAME"], img["LEGOR"])
+                                        # _String += '<a href="{}" target="blank">\n<img src="{}" alt="{}"> \n<h4 class="myh4">{}</h4>\n</a>\n'.format(trimAbsPath(img["HR_OLD_ADDS"]), trimAbsPath(img["HR_OLD_ADDS"]).replace("/Images/","/Thumbnails/"), img["IMAGENAME"], img["LEGOR"])
                                         _String += anchorTagBuilder(img["HR_OLD_ADDS"], img["IMAGENAME"], img["LEGOR"])
                                         logging.info("Adding {} to {}.html".format(img["IMAGENAME"],taxname))
                 # Once the main designation of the images in the html of the species have been set up, we can place anything else (i.e., legs, spinnerets, etc.)
@@ -166,7 +174,7 @@ def populateHtmls(df, rootHtmlTemplates, masterHtmlPath):
                     if img["IMAGENAME"] not in blackList and img["IMAGENAME"][10] == sex:
                         blackList.append(img["IMAGENAME"])
                         _String += anchorTagBuilder(img["HR_OLD_ADDS"], img["IMAGENAME"], img["LEGOR"])
-                        # _String += '<a href="{}" target="blank">\n<img src="{}" alt="{}"> \n<h3 class="myh3">{}</h3>\n</a>\n'.format(trimAbsPath(img["HR_OLD_ADDS"]), trimAbsPath(img["HR_OLD_ADDS"]).replace("/Images/","/Thumbnails/"), img["IMAGENAME"], img["LEGOR"])                                                                                                                            img["IMAGENAME"], img["LEGOR"])
+                        # _String += '<a href="{}" target="blank">\n<img src="{}" alt="{}"> \n<h4 class="myh4">{}</h4>\n</a>\n'.format(trimAbsPath(img["HR_OLD_ADDS"]), trimAbsPath(img["HR_OLD_ADDS"]).replace("/Images/","/Thumbnails/"), img["IMAGENAME"], img["LEGOR"])                                                                                                                            img["IMAGENAME"], img["LEGOR"])
                         logging.info("Adding {} to {}.html".format(img["IMAGENAME"],taxname))
 
             return(_String)
@@ -209,7 +217,7 @@ def populateHtmls(df, rootHtmlTemplates, masterHtmlPath):
                     else: #otherwise, there's probably a number representing morphospecies that shouldn't be in italics
                         file_read = file_read.replace(tag, "<em>{}</em> {}".format(taxonName[0].split(' ')[0], taxonName[0].split(' ')[1]))
                 elif indx ==2: #Back Home link
-                    file_read = file_read.replace(tag, '<a target= "_blank" href="..\..\index.html"> <P><CENTER>Back to inventory website </CENTER></a>\n'.format(chosenNameInv, "Inventory website"))
+                    file_read = file_read.replace(tag, '<div class="regreso"><a target= "_blank" href="..\..\index.html"><font color="blue" size="3"> Back to inventory home</font></a></div>'.format(chosenNameInv, "Inventory website"))
                 elif indx ==3: #The Search title in the body
                     file_read = file_read.replace(tag, fillDescription(taxonName[0]))
                 else: #The list of child taxonomic nodes
@@ -237,11 +245,10 @@ def populateHtmls(df, rootHtmlTemplates, masterHtmlPath):
                 targetHtml = jn(speciesHtmlPath, '{}.html'.format(species))
                 isSpecies = True
 
-                #pass species+author when possible using a tuple
+                #pass species+author when possible using a list
                 authorThisSpecies = r_df[r_df[thisTaxonRank] == species]["SPAUTH"].values[0]
                 if authorThisSpecies != "0":
                     speciesAuth = [species, authorThisSpecies]
-                    print(speciesAuth)
                 else:
                     speciesAuth = [species]
                 copyfile(speciesTemplate, targetHtml)

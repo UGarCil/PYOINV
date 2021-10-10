@@ -11,12 +11,14 @@ from populateHtmls import populateHtmls
 from CloneDirectories import clonedirectories
 import logging
 
-logging.basicConfig(filename="Log.txt", level=logging.INFO,
+logging.basicConfig(filename="log.txt", level=logging.INFO,
     format='%(asctime)s; %(levelname)s; %(message)s')
 
 # Find the path to the images' folder
 currPath = os.getcwd()
 pathImages = jn(currPath, "Images")
+
+logging.info(f"{'#'*10}Starting Pyoinv{'#'*10}")
 
 try:
     assert(os.path.isdir("Images")), "The folder images is mispelled or it doesn't exist"
@@ -28,6 +30,29 @@ except AssertionError as err:
 os.mkdir("HTML_files") if "HTML_files" not in os.listdir(currPath) else print("There seems to be an HTML_files folder already. Some data loss could occur")
 masterHtmlPath = jn(currPath, "HTML_files")
 rootHtmlTemplates = jn(currPath, "html_templates")
+
+# Evaluate whether or not the folder Thumbnails already exists. If yes, ask user if overwrite, otherwise do nothing
+if "Thumbnails" not in os.listdir(currPath):
+    clonedirectories(pathImages, "Thumbnails")
+else:
+    userAnswer = input("There seems to be a Thumbnails folder already. Would you like to erase and rewrite its contents? [y/n]").lower()
+    if userAnswer == "y":
+        # Create a low resolution copy of the directory tree that contains the high resolution images
+        clonedirectories(pathImages,"Thumbnails")
+        logging.info("The new directory Thumbnails has been successfully created")
+    else:
+        logging.info("User decided not to create a new Thumbnails folder")
+
+# Evaluate if a Summary.txt file already exists
+nameSummaryFile = "Summary_images_processed.txt"
+if nameSummaryFile not in os.listdir(currPath):
+    with open(jn(currPath, nameSummaryFile), "w") as file:
+        file.write("Image_name\tSpecies\tStructure_and_view\timage_dir\n")
+    logging.info(f"File '{nameSummaryFile}' created..")
+else:
+    with open(jn(currPath, nameSummaryFile), "a") as file:
+        file.write((f"{'#####'}\t" *4) + "\n")
+    logging.info(f"File '{nameSummaryFile}' created..")
 
 # Load excel table with taxonomic information on species
 taxonomic_df = pd.read_excel(jn(currPath, "SPPDATA_EX.xlsx"))
@@ -130,10 +155,7 @@ def populateColumns(imageRow):
     )
     return(_String.split('\t'))
 
-# Create a low resolution copy of the directory tree that contains the high resolution images
-logging.info("Cloning 'Images' folder to create thumbnails..")
-clonedirectories(pathImages,"Thumbnails")
-logging.info("The new directory Thumbnails has been successfully created")
+
 
 logging.info("Retrieving images list..")
 listImages = extractImagesList(pathImages).replace('\\','/').split('\n')
@@ -158,8 +180,8 @@ populateHtmls(newEsquema_df, rootHtmlTemplates, masterHtmlPath)
 print('''
 {}
 Thank you for using PYOINV. The program has finished running. You can find additional information on how your data was processed in the log.txt file located in the same folder as main.py.
-If you have any questions, feel free to contact the Alvarez-Padilla lab at fap@ciencias.unam.mx. Press enter to exit the program.
+If you have any questions. You can find a summary of the image files processed in the folder {} feel free to contact the Alvarez-Padilla lab at fap@ciencias.unam.mx. Press enter to exit the program.
 {} 
-'''.format(("="*200),("="*200)))
+'''.format(("="*200),nameSummaryFile,("="*200)))
 logging.info("Pyoinv has finished running")
 input()

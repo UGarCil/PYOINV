@@ -111,10 +111,10 @@ img{
     border-color: #3300FF;
 		margin-bottom: 8px;
 		margin-top: 8px;
+
 }
+
 .regreso{
-	/* float: right;
-	padding-right: 20px; */
-	text-align: center;
-	margin-top: 0px;
+	float: right;
+	padding-right: 20px;
 }
