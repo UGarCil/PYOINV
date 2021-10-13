@@ -43,7 +43,8 @@ def clonedirectories(PathcloneFrom, nameDir):
         listImagesNewFolder += "\n".join(imagesList) + '\n'
     listImagesNewFolder = listImagesNewFolder.strip()
 
-    for imagePath in listImagesNewFolder.split('\n')[:-1]:
+    
+    for imagePath in listImagesNewFolder.split('\n'):
         try:
             imageFile = Image.open(imagePath)
             # Change the images to a medium resolution
