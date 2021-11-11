@@ -55,12 +55,12 @@ else:
     logging.info(f"File '{nameSummaryFile}' created..")
 
 # Load excel table with taxonomic information on species
-taxonomic_df = pd.read_excel(jn(currPath, "SPPDATA_EX.xlsx"))
+taxonomic_df = pd.read_excel(jn(currPath, "SPPDATA_EX.xlsx"), engine='openpyxl')
 taxonomic_df = taxonomic_df.astype(str)
 taxonomic_df = taxonomic_df.fillna('')
 # Load dataframes with information on the name and view of the different structures
-views_df = pd.read_excel(jn(currPath, "structureNomenclature.xlsx"), sheet_name="views")
-struct_df = pd.read_excel(jn(currPath, "structureNomenclature.xlsx"), sheet_name="structures")
+views_df = pd.read_excel(jn(currPath, "structureNomenclature.xlsx"), sheet_name="views", engine='openpyxl')
+struct_df = pd.read_excel(jn(currPath, "structureNomenclature.xlsx"), sheet_name="structures", engine='openpyxl')
 
 
 
@@ -172,7 +172,8 @@ newEsquema = []
 newEsquema_df = pd.DataFrame(newEsquema, columns=EsHeaders)
 
 # Save new Esquema into an excel file
-newEsquema_df.to_excel("Esquema.xlsx")
+newEsquema_df.to_excel("Esquema.xlsx", engine='openpyxl')
+
 logging.info("The Eschema.xlsx successfully created")
 
 populateHtmls(newEsquema_df, rootHtmlTemplates, masterHtmlPath)
