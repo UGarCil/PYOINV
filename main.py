@@ -1,5 +1,5 @@
 #!usr/bin/env/python
-# Pioinv 2.0: Create a webpage for standardized faunistic inventories
+# Pyoinv 2.0: Create a webpage for standardized faunistic inventories
 # File created on August 18th by Uriel Garcilazo. Comments as UGC
 # The program receives a path representing the master folder from which images of species have been taken.
 # Images are assumed to have been named following a standardized protocol
@@ -10,6 +10,7 @@ import pandas as pd
 from populateHtmls import populateHtmls
 from CloneDirectories import clonedirectories
 import logging
+import evalError as eE
 
 logging.basicConfig(filename="log.txt", level=logging.INFO,
     format='%(asctime)s; %(levelname)s; %(message)s')
@@ -31,17 +32,13 @@ os.mkdir("HTML_files") if "HTML_files" not in os.listdir(currPath) else print("T
 masterHtmlPath = jn(currPath, "HTML_files")
 rootHtmlTemplates = jn(currPath, "html_templates")
 
-# Evaluate whether or not the folder Thumbnails already exists. If yes, ask user if overwrite, otherwise do nothing
-if "Thumbnails" not in os.listdir(currPath):
-    clonedirectories(pathImages, "Thumbnails")
-else:
-    userAnswer = input("There seems to be a Thumbnails folder already. Would you like to erase and rewrite its contents? [y/n]").lower()
-    if userAnswer == "y":
-        # Create a low resolution copy of the directory tree that contains the high resolution images
-        clonedirectories(pathImages,"Thumbnails")
-        logging.info("The new directory Thumbnails has been successfully created")
-    else:
-        logging.info("User decided not to create a new Thumbnails folder")
+
+
+
+
+
+
+
 
 # Evaluate if a Summary.txt file already exists
 nameSummaryFile = "Summary_images_processed.txt"
@@ -54,13 +51,20 @@ else:
         file.write((f"{'#####'}\t" *4) + "\n")
     logging.info(f"File '{nameSummaryFile}' created..")
 
+
+# Variables naming the excel files
+tax_df_Name = "SPPDATA_EX.xlsx"
+struct_df_Name = "structureNomenclature.xlsx"
+
+
+
 # Load excel table with taxonomic information on species
-taxonomic_df = pd.read_excel(jn(currPath, "SPPDATA_EX.xlsx"))
+taxonomic_df = pd.read_excel(jn(currPath, tax_df_Name), engine='openpyxl')
 taxonomic_df = taxonomic_df.astype(str)
 taxonomic_df = taxonomic_df.fillna('')
 # Load dataframes with information on the name and view of the different structures
-views_df = pd.read_excel(jn(currPath, "structureNomenclature.xlsx"), sheet_name="views")
-struct_df = pd.read_excel(jn(currPath, "structureNomenclature.xlsx"), sheet_name="structures")
+views_df = pd.read_excel(jn(currPath, struct_df_Name), sheet_name="views", engine='openpyxl')
+struct_df = pd.read_excel(jn(currPath, struct_df_Name), sheet_name="structures", engine='openpyxl')
 
 
 
@@ -70,7 +74,9 @@ def extractImagesList(path):
     _String = ''
     for root, folder, files in os.walk(pathImages):
         for file in files:
-            _String += (jn(root,file))+ "\n" if file.endswith('.jpg')  else None
+            for format in ['.jpg', '.jpeg', '.tiff', ".png", ".gif"]:
+                if file.lower().endswith(format):
+                    _String += (jn(root,file))+ "\n"
             # _String += (jn(".\Images",folder, file))+ "\n" if file.endswith('.jpg')  else None
     return(_String)
 
@@ -86,7 +92,6 @@ def populateColumns(imageRow):
     imageName = imageRow[-1]
     invCo = ""
     invSpCode = imageName[0:10]
-    # !!!
     sexCo = imageName[10]
     metCo = imageName[11]
     parCo = imageName[12:15]
@@ -158,30 +163,50 @@ def populateColumns(imageRow):
 
 
 logging.info("Retrieving images list..")
-listImages = extractImagesList(pathImages).replace('\\','/').split('\n')
+listImages = extractImagesList(pathImages).strip().replace('\\','/').split('\n')
 logging.info("A list of images has been retrieved from the 'Images' folder")
 
 # Name of column headers. For additional information look at Ex_Esquema...xlsx
 EsHeaders = ["HR_OLD_ADDS", "IMAGENAME", "INVCO", "InvSP_CODE", "SEXCO", "METCO", "PARCO", "VIECO", "VOUCO", "MAGCO", "MICCO", "FTYCO", "LEGOR", "COTBK", "FAMILY", "GENUS", "SPP", "SPECIES", "WSC", "SPAUTH", "SPDISTPL", "VOUCO2", "LOCDATA", "DET", "FEMSPE", "MALSPE", "TAXNOT", "IMGAUT"]
 
-# Make the dataframe of our new Esquema by first processing each of the image paths by adding values for the columns
-# specified in EsHeaders, then adding the edited row to a list. Then turn that list into a pandas dataframe
-newEsquema = []
-[newEsquema.append(populateColumns(row)) for row in listImages if len(row)!=0]
-# Turn the new list of lists (i.e. table) into a new array
-newEsquema_df = pd.DataFrame(newEsquema, columns=EsHeaders)
 
-# Save new Esquema into an excel file
-newEsquema_df.to_excel("Esquema.xlsx")
-logging.info("The Eschema.xlsx successfully created")
+# At this point, call the evalError module. If no error are detected, then proceed. Otherwise ask user to fix issues
+if eE.eval(listImages, (taxonomic_df, "SPECIES DATA", tax_df_Name), (struct_df, "structures", struct_df_Name), (views_df, "views", struct_df_Name)):
+    # Evaluate whether or not the folder Thumbnails already exists. If yes, ask user if overwrite, otherwise do nothing
+    if "Thumbnails" not in os.listdir(currPath):
+        clonedirectories(pathImages, "Thumbnails")
+    else:
+        userAnswer = input("There seems to be a Thumbnails folder already. Would you like to erase and rewrite its contents? It may take a while for large datasets [y/n]").lower()
+        if userAnswer == "y":
+            # Create a low resolution copy of the directory tree that contains the high resolution images
+            clonedirectories(pathImages,"Thumbnails")
+            logging.info("The new directory Thumbnails has been successfully created")
+        else:
+            logging.info("User decided not to create a new Thumbnails folder")
 
-populateHtmls(newEsquema_df, rootHtmlTemplates, masterHtmlPath)
 
-print('''
-{}
-Thank you for using PYOINV. The program has finished running. You can find additional information on how your data was processed in the log.txt file located in the same folder as main.py.
-If you have any questions. You can find a summary of the image files processed in the folder {} feel free to contact the Alvarez-Padilla lab at fap@ciencias.unam.mx. Press enter to exit the program.
-{} 
-'''.format(("="*200),nameSummaryFile,("="*200)))
-logging.info("Pyoinv has finished running")
-input()
+    # Make the dataframe of our new Esquema by first processing each of the image paths by adding values for the columns
+    # specified in EsHeaders, then adding the edited row to a list. Then turn that list into a pandas dataframe
+    newEsquema = []
+    [newEsquema.append(populateColumns(row)) for row in listImages if len(row)!=0]
+    # Turn the new list of lists (i.e. table) into a new array
+    newEsquema_df = pd.DataFrame(newEsquema, columns=EsHeaders)
+
+    # Save new Esquema into an excel file
+    newEsquema_df.to_excel("Esquema.xlsx", engine='openpyxl')
+
+    logging.info("File Eschema.xlsx successfully created")
+
+    populateHtmls(newEsquema_df, rootHtmlTemplates, masterHtmlPath)
+
+    print('''
+    {}
+    Thank you for using PYOINV. The program has finished running. You can find additional information on how your data was processed in the log.txt file located in the same folder as main.py.
+    If you have any questions. You can find a summary of the image files processed in the folder {} feel free to contact the Alvarez-Padilla lab at fap@ciencias.unam.mx. Press enter to exit the program.
+    {} 
+    '''.format(("="*200),nameSummaryFile,("="*200)))
+    logging.info("Pyoinv has finished running")
+    input()
+else:
+    print("At least one critical error was found while trying to match images with their tags. Look at CriticalErrors.txt and fix issues. Then run Pyoinv again")
+    input()

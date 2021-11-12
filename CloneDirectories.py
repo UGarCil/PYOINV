@@ -38,14 +38,24 @@ def clonedirectories(PathcloneFrom, nameDir):
         logging.critical("The folder {} couldn't be overwritten. Please make sure no other applications are using any of the folder's contents".format(nameDir))
     # then, lower the resolution of the new images using pillow
     listImagesNewFolder = ""
+
     for root, folder, files in os.walk(PathcloneFrom):
         imagesList = [jn(root,file) for file in files if isImage(file)]
         listImagesNewFolder += "\n".join(imagesList) + '\n'
     listImagesNewFolder = listImagesNewFolder.strip()
+    totalNumImages = listImagesNewFolder.split('\n')
+    logging.info("Pyoinv detected {} image files that will be converted into thumbnails".format(len(totalNumImages)))
+    print("Pyoinv detected {} image files that will be converted into thumbnails. This might take a couple of minutes..".format(len(totalNumImages)))
 
-    
-    for imagePath in listImagesNewFolder.split('\n'):
+
+    for indx, imagePath in enumerate(totalNumImages):
         try:
+            # Notify the user in the screen about on the process of making thumbnails
+            if indx % (int(len(totalNumImages)/10)) == 0:
+                print("{:.2f}% of thumbnails completed".format((indx / len(totalNumImages))*100))
+            if indx+1 == len(totalNumImages):
+                print("{:.2f}% of thumbnails completed".format(((indx+1) / len(totalNumImages))*100))
+
             imageFile = Image.open(imagePath)
             # Change the images to a medium resolution
             possibleExts = [imagePath.replace(f"{x}Images{x}", f"{x}Thumbnails{x}") for x in ["/", "\\"]]
@@ -55,7 +65,6 @@ def clonedirectories(PathcloneFrom, nameDir):
         except:
             None if imagePath == "" else print("An error ocurred trying to change the resolution of {}".format(imagePath))
             logging.info("An error ocurred when trying to change the resolution of {}".format(imagePath)) if imagePath != "" else None
-
 
 # if we're calling the module directly then call the function right away
 if __name__ == "__main__":

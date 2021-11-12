@@ -139,10 +139,13 @@ def populateHtmls(df, rootHtmlTemplates, masterHtmlPath):
                     return ("")
             
             _String = ''
-            # Get a list of all pictures for a given species
-            listImages = df[df["SPECIES"] == taxname]
+            
+
+            listImages = df[df["SPECIES"] == taxname] # Get a list of all pictures for a given species
             orderShow = ["habd", "habl", "habv", "prs", "epiv", "epid", "epi", "palv", "palp", "pal"]
-            blackList = []
+            blackList = [] #empty list to check out images that have been processed already
+            
+            #iterate over the images three times, prioritizing females, then males, then juveniles
             for sex in ["f", "m", 'j']:
                 if thereIsSex(sex, listImages):
                     fullSex = determineSex(sex)
@@ -266,6 +269,11 @@ def populateHtmls(df, rootHtmlTemplates, masterHtmlPath):
     copyfile(TaxRankTemplate, inventoryHomeName)
     editHTML(inventoryHomeName, False, "Family search:", taxonomic_Ranks[indxHighRank], df)
 
+
+    # Create a new txt log file and delete the previous one if exists
+    logFile = jn(currPath, "Summary_images_processed.txt")
+    os.remove(logFile) if os.path.exists(logFile) else None
+    open(logFile, "w").close()
     # Then, create htmls recursively starting at the highest taxonomic rank
     recursion(indxHighRank, df)
         
