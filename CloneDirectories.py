@@ -43,7 +43,7 @@ def clonedirectories(PathcloneFrom, nameDir):
         imagesList = [jn(root,file) for file in files if isImage(file)]
         listImagesNewFolder += "\n".join(imagesList) + '\n'
     listImagesNewFolder = listImagesNewFolder.strip()
-    totalNumImages = listImagesNewFolder.split('\n')
+    totalNumImages = [x for x in listImagesNewFolder.split('\n') if x!=""]
     logging.info("Pyoinv detected {} image files that will be converted into thumbnails".format(len(totalNumImages)))
     print("Pyoinv detected {} image files that will be converted into thumbnails. This might take a couple of minutes..".format(len(totalNumImages)))
 
@@ -61,10 +61,16 @@ def clonedirectories(PathcloneFrom, nameDir):
             possibleExts = [imagePath.replace(f"{x}Images{x}", f"{x}Thumbnails{x}") for x in ["/", "\\"]]
             for ext in possibleExts:
                 if os.path.exists(ext):
-                    imageFile.save(imagePath.replace("Images","Thumbnails"),quality=50)
+                    imageFile.save(imagePath.replace("Images","Thumbnails"),quality=20)
+        except KeyboardInterrupt:
+            print("Program stopped by user")
+            logging.info("Execution aborted by user")
+            quit()
         except:
             None if imagePath == "" else print("An error ocurred trying to change the resolution of {}".format(imagePath))
             logging.info("An error ocurred when trying to change the resolution of {}".format(imagePath)) if imagePath != "" else None
+            
+            
 
 # if we're calling the module directly then call the function right away
 if __name__ == "__main__":

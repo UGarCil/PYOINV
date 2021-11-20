@@ -84,7 +84,7 @@ def populateHtmls(df, rootHtmlTemplates, masterHtmlPath):
             # doesn't matter which one, to populate the empty string
             taxrow = df[df["SPECIES"] == taxname].head(1)
             Des = ''
-            Des += "<b>Species Code: </b>" + (taxrow["VOUCO2"].values[0]) + ". "
+            Des += "<b>Species Code: </b>" + (taxrow["InvSP_CODE"].values[0]) + ". "
             Des += "<b>Locality: </b>" + (taxrow["LOCDATA"]).values[0] + ". "
             Des += "<b>Specimens:</b> Female, " + (taxrow["FEMSPE"]).values[0] + ", Male " + (taxrow["MALSPE"].values[0]) + ". "
             Des += "<b>Species ID: </b>" + (taxrow["DET"]).values[0] + ". "

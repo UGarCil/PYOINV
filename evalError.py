@@ -20,7 +20,7 @@ def findInDf(image, stng, trgt_df, colName, sheet_name, file_name):
             logFile.write("{}: {} wasn't found in column {} of sheet {} in file {} \t{}\n".format(img_name, stng, colName, sheet_name, file_name,image))
             
 
-def eval_imgLenght(img_list):
+def eval_imgLength(img_list):
     imageNames = [x.split('/')[-1] for x in img_list]
     _String = "{} The length in the name of these files doesn't match the first 22 characters + underscore symbol expected by Pioinv {} \n".format(("#"*10), ("#"*10))
     with open(jn(os.getcwd(),logFileName), "a") as logFile:
@@ -48,7 +48,7 @@ def eval(img_list, tax_Tuple, struc_Tuple, view_Tuple):
         os.remove(filePath)
     open(filePath, "w").close()
 
-    eval_imgLenght(img_list)
+    eval_imgLength(img_list)
 
     for img in img_list:
         imageName = img.split("/")[-1]
@@ -63,7 +63,7 @@ def eval(img_list, tax_Tuple, struc_Tuple, view_Tuple):
         vieCo = imageName[15] #Ex. d for dorsal view
         findInDf(img, vieCo, views_df, "AcrView", vw_df_sheet, vw_df_name)
         vouCo = imageName[16:22] #Ex. TXV058 for photovoucher
-        findInDf(img, vouCo, taxonomic_df, "VOUCOD", tx_df_sheet, tx_df_name)
+        # findInDf(img, vouCo, taxonomic_df, "VOUCOD", tx_df_sheet, tx_df_name) #commented on 11/19/2021. !!! This could be reverted
         # magCo = imageName.split('_')[1] #Ex. 400X for magnification
         # micCo = imageName.split('_')[2].split('.')[0] #Ex. _E2B for microscope model
         # ftyCo = imageName.split('.')[1] #Ex. .jpg for image extension
