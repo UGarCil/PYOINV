@@ -46,7 +46,7 @@ def runMain():
 
 
     # Variables naming the excel files
-    tax_df_Name = "SPPDATA_EX.xlsx"
+    tax_df_Name = "SPPDATA.xlsx"
     struct_df_Name = "structureNomenclature.xlsx"
 
 
