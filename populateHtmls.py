@@ -32,8 +32,8 @@ def populateHtmls(df, rootHtmlTemplates, masterHtmlPath):
     # Create two additional folders, one for Menus and one for species htmls
     menusPath = jn(masterHtmlPath,"Menus")
     speciesHtmlPath = jn(masterHtmlPath,'Species')
-    os.mkdir(menusPath) if not os.path.isdir(menusPath) else print("A folder named Menus already exists in your HTML folder. Some data loss could occur..")#, logging.warning("A folder named Menus already exists in your HTML folder. Some data loss could occur..")
-    os.mkdir(speciesHtmlPath) if not os.path.isdir(speciesHtmlPath) else print("A folder named Species already exists in your HTML folder. Some data loss could occur..")#, logging.warning("A folder named Species already exists in your HTML folder. Some data loss could occur..")    
+    os.mkdir(menusPath) if not os.path.isdir(menusPath) else print("A folder named Menus already exists in your HTML folder. Some data loss could occur.")#, logging.warning("A folder named Menus already exists in your HTML folder. Some data loss could occur..")
+    os.mkdir(speciesHtmlPath) if not os.path.isdir(speciesHtmlPath) else print("A folder named Species already exists in your HTML folder. Some data loss could occur.")#, logging.warning("A folder named Species already exists in your HTML folder. Some data loss could occur..")    
 
     # Path for html/css templates
     speciesTemplate = jn(rootHtmlTemplates, "speciesTemplate.html")
@@ -85,7 +85,7 @@ def populateHtmls(df, rootHtmlTemplates, masterHtmlPath):
             taxrow = df[df["SPECIES"] == taxname].head(1)
             Des = ''
             Des += "<b>Species Code: </b>" + (taxrow["InvSP_CODE"].values[0]) + ". "
-            Des += "<b>Locality: </b>" + (taxrow["LOCDATA"]).values[0] + ". "
+            Des += "<b>Locality for photographed specimens: </b>" + (taxrow["LOCDATA"]).values[0] + ". "
             Des += "<b>Specimens:</b> Female, " + (taxrow["FEMSPE"]).values[0] + ", Male " + (taxrow["MALSPE"].values[0]) + ". "
             Des += "<b>Species ID: </b>" + (taxrow["DET"]).values[0] + ". "
             Des += "<b>Images author: </b>" + (taxrow["IMGAUT"]).values[0] + ". " 
@@ -100,11 +100,11 @@ def populateHtmls(df, rootHtmlTemplates, masterHtmlPath):
             def determineSex(s):
             # Retrieve the full text of the specimen's sex
                 if s == "f":
-                    fullSex = "Female:"
+                    fullSex = "Female specimens:"
                 elif s == "m":
-                    fullSex = "Male:"
+                    fullSex = "Male specimens:"
                 elif s.lower() == "j":
-                    fullSex = "Juvenile"
+                    fullSex = "Juvenile specimens"
                 else:
                     fullSex = "Sex undetermined"
                 return (fullSex)

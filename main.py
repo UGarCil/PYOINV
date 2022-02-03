@@ -21,7 +21,7 @@ def runMain():
         raise err
 
     # path to master html folder and the html/css templates
-    os.mkdir("HTML_files") if "HTML_files" not in os.listdir(currPath) else print("There seems to be an HTML_files folder already. Some data loss could occur")
+    os.mkdir("HTML_files") if "HTML_files" not in os.listdir(currPath) else print("There seems to be an HTML_files folder already. Some data loss could occur.")
     masterHtmlPath = jn(currPath, "HTML_files")
     rootHtmlTemplates = jn(currPath, "html_templates")
 
@@ -122,24 +122,24 @@ def runMain():
         # searchQuery = imageRow[-3:-1] #where -3 is the third element from the end of the array to the left, and -1 is the first element in the array, which isn't included but serves as boundary
         # # Find the taxonomic information using the searchQuery
         try:
-            searchQuery = taxonomic_df[taxonomic_df["MSP_CODE"] == imageName[0:10]]["SPECIES"].values[0]
+            searchQuery = taxonomic_df[taxonomic_df["MSP_CODE"] == imageName[0:10]]["UPDATED_SPP_NAME"].values[0]
         except:
             logging.critical("The voucher {} couldn't be found in your SPPDATA.xlsx. Please fix the issue and run the program again".format(imageName[0:10]))
 
         # searchQuery = imageRow[-3:-1] #where -3 is the third element from the end of the array to the left, and -1 is the first element in the array, which isn't included but serves as boundary
         # Find the taxonomic information using the searchQuery
 
-        speciesRow = taxonomic_df[taxonomic_df["SPECIES"] == searchQuery]
+        speciesRow = taxonomic_df[taxonomic_df["UPDATED_SPP_NAME"] == searchQuery]
         family = speciesRow["FAMILY"].values[0]
         genus = searchQuery.split(' ')[0]
         spp = searchQuery.split(' ')[1]
         sppName = searchQuery
         wsc_number = speciesRow["WSP_NUM"].values[0]
         spAuth = speciesRow["SP_AUTHOR"].values[0]
-        spDistPl = speciesRow["DIST"].values[0]
+        # spDistPl = speciesRow["DIST"].values[0]
         # vouchCo2 = speciesRow["VOUCOD"].values[0] #commented on 11/19/2021. !!! Could be reverted
         locData = speciesRow["LOCALITY"].values[0]
-        det = speciesRow["ID AUTHOR"].values[0]
+        det = speciesRow["ID_AUTHOR"].values[0]
         femSpe = speciesRow["FEMNUM"].values[0]
         malSpe = speciesRow["MALNUM"].values[0]
         taxNot = speciesRow["TAXON NOTES"].values[0]
@@ -147,9 +147,9 @@ def runMain():
         
 
 
-        _String += ("\t{}"*23).format(
+        _String += ("\t{}"*22).format(
             imageName, invSpCode, sexCo, metCo, parCo, vieCo, magCo, micCo, ftyCo, leGor,
-            family, genus, spp, sppName, wsc_number, spAuth, spDistPl, locData, det, femSpe, malSpe, taxNot, imgAut
+            family, genus, spp, sppName, wsc_number, spAuth, locData, det, femSpe, malSpe, taxNot, imgAut
         )
         return(_String.split('\t'))
 
@@ -161,7 +161,7 @@ def runMain():
 
     # Name of column headers. For additional information look at Ex_Esquema...xlsx
     # EsHeaders = ["HR_OLD_ADDS", "IMAGENAME", "INVCO", "InvSP_CODE", "SEXCO", "METCO", "PARCO", "VIECO", "VOUCO", "MAGCO", "MICCO", "FTYCO", "LEGOR", "COTBK", "FAMILY", "GENUS", "SPP", "SPECIES", "WSC", "SPAUTH", "SPDISTPL", "VOUCO2", "LOCDATA", "DET", "FEMSPE", "MALSPE", "TAXNOT", "IMGAUT"]
-    EsHeaders = ["HR_OLD_ADDS", "IMAGENAME", "InvSP_CODE", "SEXCO", "METCO", "PARCO", "VIECO", "MAGCO", "MICCO", "FTYCO", "LEGOR", "FAMILY", "GENUS", "SPP", "SPECIES", "WSC", "SPAUTH", "SPDISTPL", "LOCDATA", "DET", "FEMSPE", "MALSPE", "TAXNOT", "IMGAUT"]
+    EsHeaders = ["HR_OLD_ADDS", "IMAGENAME", "InvSP_CODE", "SEXCO", "METCO", "PARCO", "VIECO", "MAGCO", "MICCO", "FTYCO", "LEGOR", "FAMILY", "GENUS", "SPP", "SPECIES", "WSC", "SPAUTH", "LOCDATA", "DET", "FEMSPE", "MALSPE", "TAXNOT", "IMGAUT"]
 
 
     # At this point, call the evalError module. If no error are detected, then proceed. Otherwise ask user to fix issues
@@ -170,7 +170,7 @@ def runMain():
         if "Thumbnails" not in os.listdir(currPath):
             clonedirectories(pathImages, "Thumbnails")
         else:
-            userAnswer = input("There seems to be a Thumbnails folder already. Would you like to erase and rewrite its contents? It may take a while for large datasets [y/n]").lower()
+            userAnswer = input("There seems to be a Thumbnails folder already. Would you like to erase and rewrite its contents? It may take a while for large datasets [y/n]\n").lower()
             if userAnswer == "y":
                 # Create a low resolution copy of the directory tree that contains the high resolution images
                 clonedirectories(pathImages,"Thumbnails")
