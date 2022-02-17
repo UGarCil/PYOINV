@@ -1,5 +1,5 @@
 #!usr/bin/env/python
-# Pyoinv 2.0: Create a webpage for standardized faunistic inventories
+# Pyoinv: Create a webpage for standardized faunistic inventories
 # File created on August 18th by Uriel Garcilazo. Comments as UGC
 # The program receives a path representing the master folder from which images of species have been taken.
 # Images are assumed to have been named following a standardized protocol
