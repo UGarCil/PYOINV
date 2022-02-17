@@ -1,4 +1,4 @@
-# PYOINV v2.0
+# PYOINV
 Based on BIOINV 2.2 (Alvarez-Padilla et. al., 2020) to automate the production of standardized faunistic inventories on the web. For an example on the implementation of this program in three inventories please visit: 
 
 ## http://www.unamfcaracnolab.com/
