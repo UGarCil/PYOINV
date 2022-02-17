@@ -1,9 +1,0 @@
-2022-02-04 19:38:08,066; INFO; ##########Starting Pyoinv##########
-2022-02-04 19:38:08,067; INFO; File 'Summary_images_processed.txt' created..
-2022-02-04 19:38:09,949; INFO; Retrieving images list..
-2022-02-04 19:38:09,964; INFO; A list of images has been retrieved from the 'Images' folder
-2022-02-04 19:38:09,964; INFO; Searching for errors in the dataset..
-2022-02-04 19:38:09,996; INFO; No errors found in the dataset (hooray!)
-2022-02-04 19:38:09,996; INFO; Cloning 'Images' folder to create Thumbnails folder..
-2022-02-04 19:38:10,011; INFO; Pyoinv detected 67 image files that will be converted into thumbnails
-2022-02-04 19:38:13,884; INFO; Execution aborted by user
